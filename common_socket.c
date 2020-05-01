@@ -93,14 +93,12 @@ int socket_shutdown(socket_t *self, int how) {
 }
 
 int socket_send(socket_t *self, char *mensaje, size_t length) {
-    printf(".s\n");
     self->conf.interchanger = _interchanger_send;
     return _socket_interchange_data(self, mensaje, length);
 }
 
 int socket_receive(socket_t *self, char *buf, size_t length) {
     self->conf.interchanger = _interchanger_receive;
-    printf("...%d\n", __LINE__);
     return _socket_interchange_data(self, buf, length);
 }
 
@@ -196,22 +194,15 @@ static int _socket_interchange_data(socket_t *self, char *buf, size_t length) {
     interchanger_t interchanger = self->conf.interchanger;
     while(restantes > 0) {
         bytes_interchanged = interchanger(fd, &buf[total], restantes);
-        printf(".....%d\n", __LINE__);
-        printf("%s\n", strerror(errno));
-        printf("rec %ld\n", bytes_interchanged);
         if (bytes_interchanged ==  0) {
-            printf("E.....%d\n", __LINE__);
             break;
         } else if (bytes_interchanged < 0) {
             fprintf(stderr, "Error sending data: %s\n", strerror(errno));
-            printf("E.....%d\n", __LINE__);
             return ERROR;
         }
         total += bytes_interchanged;
         restantes = length - bytes_interchanged;
     }
-    printf("....%d\n", __LINE__);
-
     return SUCCESS;
 }
 

@@ -44,7 +44,6 @@ static void _commandlist_next_state(commandlist_t *self, char c) {
         _next_state_searching,
         _next_state_in_command
     };
-   
     if (state == SEARCHING || state == IN_COMMAND) {
         self->state = proximo_estado[state](self, c);
     }
@@ -52,6 +51,7 @@ static void _commandlist_next_state(commandlist_t *self, char c) {
 
 static void commandlist_next_line(commandlist_t *self) {
     do {
+        // TODO change to single byte reading to 32 bytes reading.
         char c = fgetc(self->stream);
         _commandlist_next_state(self, c);
     } while (self->state != FINISH_COMMAND 
