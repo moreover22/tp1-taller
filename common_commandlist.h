@@ -3,7 +3,8 @@
 #include <stdio.h>
 
 
-typedef enum commandlist_state {SEARCHING = 0, IN_COMMAND = 1, FINISH_COMMAND, FINISH_FILE} cl_state_t;
+typedef enum commandlist_state {SEARCHING = 0, IN_COMMAND = 1, FINISH_COMMAND, 
+                                                        FINISH_FILE} cl_state_t;
 
 typedef struct commandlist {
     FILE *stream;
@@ -15,5 +16,4 @@ typedef struct commandlist {
 int commandlist_create(commandlist_t *self, FILE *stream);
 int commandlist_next(commandlist_t *self, char **buffer);
 int commandlist_destroy(commandlist_t *self);
-
 #endif

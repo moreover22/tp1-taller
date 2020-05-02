@@ -51,7 +51,7 @@ int server_comunicate(server_t *self, socket_t *client) {
 int server_run(server_t *self, char *buffer, size_t longitud) {
     socket_t client;
     server_accept(self, &client);
-    for(;;) {
+    for (;;) {
         if (server_comunicate(self, &client) != SERVER_SUCCESS)
             break;
     }

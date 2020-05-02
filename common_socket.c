@@ -192,7 +192,7 @@ static int _socket_interchange_data(socket_t *self, char *buf, size_t length) {
     ssize_t restantes = length;
     int fd = self->file_descriptor;
     interchanger_t interchanger = self->conf.interchanger;
-    while(restantes > 0) {
+    while (restantes > 0) {
         bytes_interchanged = interchanger(fd, &buf[total], restantes);
         if (bytes_interchanged ==  0) {
             break;

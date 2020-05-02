@@ -51,7 +51,7 @@ static void _commandlist_next_state(commandlist_t *self, char c) {
 
 static void commandlist_next_line(commandlist_t *self) {
     do {
-        // TODO change to single byte reading to 32 bytes reading.
+        // TODO change to single byte reading to 32 bytes reading. strchr
         char c = fgetc(self->stream);
         _commandlist_next_state(self, c);
     } while (self->state != FINISH_COMMAND 
@@ -82,13 +82,10 @@ int commandlist_next(commandlist_t *self, char **buffer) {
         if (self->state == FINISH_FILE)
             return 1;
     }
-
     if (_commandlist_buffer_command(self, buffer) != 0) 
         return 1;
-
     if (self->state != FINISH_FILE)
-        self->state = SEARCHING;
-    
+        self->state = SEARCHING;    
     return 0;
 }
 

@@ -18,5 +18,4 @@ typedef struct configuration {
     engage_options_t engage_opt;
     int ai_flags;
 } configuration_t; 
-
 #endif

@@ -14,5 +14,4 @@ int client_create(client_t *self, const char *hostname, const char *service);
 int client_send(client_t *self, char *buffer, size_t longitud);
 int client_receive(client_t *self, char *buffer, size_t longitud);
 int client_destroy(client_t *self);
-
 #endif
