@@ -166,23 +166,9 @@ static int dbusinterpreter_read(dbusinterpreter_t *self, const char *src,
 }
 
 static void _mostrar_argumento(size_t id_argumento) {
-    switch (id_argumento) {
-        case ID_DESTINO:
-            printf("%s", MSG_DESTINO);
-            break;
-        case ID_RUTA:
-            printf("%s", MSG_RUTA);
-            break;
-        case ID_INTERFAZ:
-            printf("%s", MSG_INTERFAZ);
-            break;
-        case ID_METODO:
-            printf("%s", MSG_METODO);
-            break;
-        case ID_PARAMETROS:
-            printf("%s", MSG_PARAMETROS);
-            break;
-        default:
-            break;
-    }
+    if      (id_argumento == ID_DESTINO) printf("%s", MSG_DESTINO);
+    else if (id_argumento == ID_RUTA) printf("%s", MSG_RUTA);
+    else if (id_argumento == ID_INTERFAZ) printf("%s", MSG_INTERFAZ);
+    else if (id_argumento == ID_METODO) printf("%s", MSG_METODO);
+    else if (id_argumento == ID_PARAMETROS) printf("%s", MSG_PARAMETROS);
 }
