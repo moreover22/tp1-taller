@@ -203,7 +203,7 @@ static int _socket_interchange_data(socket_t *self, char *buf, size_t length) {
         total += bytes_interchanged;
         restantes = length - bytes_interchanged;
     }
-    return SUCCESS;
+    return total;
 }
 
 static int _engage_null_options(int fd) {

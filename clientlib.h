@@ -1,5 +1,5 @@
 #ifndef __CLIENTLIB_H
-#define __CLIENTIB_H
+#define __CLIENTLIB_H
 #include <stddef.h>
 #include "common_socket.h"
 

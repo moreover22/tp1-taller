@@ -12,6 +12,6 @@ typedef struct server {
 } server_t;
 
 int server_create(server_t *self, char *service);
-int server_run(server_t *self, char *buffer, size_t longitud);
+int server_run(server_t *self);
 int server_destroy(server_t *self);
 #endif

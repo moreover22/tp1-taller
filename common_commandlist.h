@@ -1,8 +1,7 @@
 #ifndef __COMMON_COMMANDLIST_H
 #define __COMMON_COMMANDLIST_H
 #include <stdio.h>
-
-
+#define WORD_SIZE 32
 typedef enum commandlist_state {SEARCHING = 0, IN_COMMAND = 1, FINISH_COMMAND, 
                                                         FINISH_FILE} cl_state_t;
 
@@ -11,6 +10,8 @@ typedef struct commandlist {
     cl_state_t state;
     size_t start;
     size_t end;
+    char buff_estatico[WORD_SIZE];
+    size_t buff_estatico_len;
 } commandlist_t;
 
 int commandlist_create(commandlist_t *self, FILE *stream);

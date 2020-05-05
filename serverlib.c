@@ -3,9 +3,10 @@
 #include <stdlib.h>
 #include <byteswap.h>
 #include <arpa/inet.h>
+#include <string.h>
+#include "common_dbusutils.h"
+#include "server_dbusinterpreter.h"
 
-#define OK_MSG "OK\n"
-#define LEN_OK_MSG 3
 #define SUCCESS 0
 
 int server_create(server_t *self, char *service) {
@@ -21,34 +22,25 @@ int server_accept(server_t *self, socket_t *client) {
     return SERVER_SUCCESS;
 }
 
-int server_comunicate(server_t *self, socket_t *client) {
-    unsigned short len = 0;
-    if (socket_receive(client, (char *) &len, 2) != SUCCESS) 
-        return SERVER_ERROR;
-    len = bswap_16(len);
-    len = ntohs(len);
-    if (len <= 0)
-        return SERVER_ERROR;
-    printf("[DEBUG] Server receive: %d\n", len);
-    char *resp = malloc(len + 1);
-    if (resp == NULL) {
-        fprintf(stderr, "No se puedo allocar memoria.\n");
-        return SERVER_ERROR;
-    }
-    if (socket_receive(client, resp, len) != SUCCESS) {
-        free(resp);
-        return SERVER_ERROR;
-    }
-    resp[len] = 0;  
-    printf("[DEBUG] |%s| --- \n", resp);
-    free(resp);
-    if (socket_send(client, OK_MSG, LEN_OK_MSG) != SUCCESS)
-        return SERVER_ERROR;
 
+int server_comunicate(server_t *self, socket_t *client) {
+    char header_start[HEADER_START];
+
+    if (socket_receive(client, (char *) &header_start, HEADER_START) <= 0) 
+        return SERVER_ERROR;
+    dbusinterpreter_t db_interp;
+    dbusinterpreter_create(&db_interp);
+    dbusinterpreter_header_start(&db_interp, header_start);
+    dbusinterpreter_show_id(&db_interp);
+    dbusinterpreter_get_and_show_header(&db_interp, client);
+    dbusinterpreter_get_and_show_body(&db_interp, client);
+    dbusinterpreter_destroy(&db_interp);
+    if (socket_send(client, OK_MSG, LEN_OK_MSG) <= 0)
+        return SERVER_ERROR;
     return SERVER_SUCCESS;
 }
 
-int server_run(server_t *self, char *buffer, size_t longitud) {
+int server_run(server_t *self) {
     socket_t client;
     server_accept(self, &client);
     for (;;) {
