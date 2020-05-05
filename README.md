@@ -56,7 +56,7 @@ El `header` contiene:
  |6C 01 00 01             |                         |  |l...            |
  ```
 
-[Aclaración: En el panel de la izquierda, se encuentra los bytes expresados en hexadecimal y a la derecha su correspondiente equivalente en ASCII (si el caracter no tiene significado en la explicación, se representa con '.')].
+[Aclaración: En el panel de la izquierda, se encuentra los bytes expresados en hexadecimal y a la derecha su correspondiente equivalente en ASCII (si el caracter no tiene significado en la explicación, se representa con '.'). Formato similar al de el editor [hexed](https://hexed.it/) ].
 
 Donde el primer `6C` corresponde al carácter en [ASCII] 'l'. Luego, `01 00 01` corresponden a `llamada a método`, `sin flags` y `versión del 1 protocolo` respectivamente. Estos primeros bytes permanecerán constantes para esta implementación del protoco.
 
@@ -91,7 +91,9 @@ Como se ve, se completa con ceros hasta completar dos palabras (completar a 8 by
 El protocolo se encuentra más detallado en la documentación [DBUS], o en el enunciado del tp.
 
 De este análisis del protocolo, se tomaron las siguientes decisiones:
-- Como los primeros 16 bytes contienen la información del tamaño del resto del cuerpo, se procede a hacer un `recv` de esos primeros bytes en un buffer estático y luego en base a esa información ya sé cuántos bytes tengo que recibir después, sin tener que esperar a que cierren el socket del otro lado. Además de poder reservar la memoria justa para almacenar los mensajes.
+- Como los primeros 16 bytes contienen la información del tamaño del resto del cuerpo, se procede a hacer un `recv` de esos primeros bytes en un buffer estático y luego en base a esa información ya sé cuántos bytes tengo que recibir después, sin tener que esperar a que cierren el socket del otro lado. Además de poder reservar la memoria justa para almacenar los mensajes. Como se muestra en el siguiente diagrama:
+
+![Cliente server](images/cliente-server.png)
 
 - Todos los campos fijos detallados anteriormente son de 8 bytes o múltiplos de 8, entonces, solamente debo alinear los argumentos y además no me tengo que fijar en qué posición estoy escribiendo porque puedo estar seguro que lo anterior tiene que estar alineado.
 
@@ -105,15 +107,6 @@ De este análisis del protocolo, se tomaron las siguientes decisiones:
     - Se leen los siguientes bytes determinados por la longitud.
 
 
-
-
-<!--
-abstraccion del socket
-read del fuffer del archivo
-interpret from server
-buffer static buffer dinamico
-client - server
- -->
 
 Referencias
 ---
