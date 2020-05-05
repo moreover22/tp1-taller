@@ -27,6 +27,15 @@ Otra manera de encarar el problema, reduciendo las llamadas a `read`, es leer de
 
 En la siguiente iteración, si hay algo en el segundo buffer estático, se almacena su contenido en el dinámico y se sigue con el bucle.
 
+El encargado de manejar la correcta lectura del comando será el TDA `common_commandlist` e interacturá con los buffers de la siguiente manera:
+
+
+<p align="center"> 
+    <img src="images/DC-buffers.png" alt="Diagrama de clases-buffers">
+</p>
+
+![](images/DC-buffers.png)
+
 Una vez obtenido un comando, el mismo se codifica según el protocolo y se envía al servidor.
 
 
