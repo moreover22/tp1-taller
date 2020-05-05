@@ -93,7 +93,9 @@ El protocolo se encuentra más detallado en la documentación [DBUS], o en el en
 De este análisis del protocolo, se tomaron las siguientes decisiones:
 - Como los primeros 16 bytes contienen la información del tamaño del resto del cuerpo, se procede a hacer un `recv` de esos primeros bytes en un buffer estático y luego en base a esa información ya sé cuántos bytes tengo que recibir después, sin tener que esperar a que cierren el socket del otro lado. Además de poder reservar la memoria justa para almacenar los mensajes. Como se muestra en el siguiente diagrama:
 
-![Cliente server](images/cliente-server.png)
+<p align="center"> 
+    <img src="images/cliente-server.png" alt="Cliente server illustration">
+</p>
 
 - Todos los campos fijos detallados anteriormente son de 8 bytes o múltiplos de 8, entonces, solamente debo alinear los argumentos y además no me tengo que fijar en qué posición estoy escribiendo porque puedo estar seguro que lo anterior tiene que estar alineado.
 
