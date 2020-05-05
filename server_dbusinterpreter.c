@@ -5,33 +5,51 @@
 #include "common_dbusutils.h"
 #include "serverlib.h"
 
-static void _mostrar_parametro(size_t id_parametro) {
-    switch (id_parametro) {
-        case ID_DESTINO:
-            printf("%s", MSG_DESTINO);
-            break;
-        case ID_RUTA:
-            printf("%s", MSG_RUTA);
-            break;
-        case ID_INTERFAZ:
-            printf("%s", MSG_INTERFAZ);
-            break;
-        case ID_METODO:
-            printf("%s", MSG_METODO);
-            break;
-        case ID_PARAMETROS:
-            printf("%s", MSG_PARAMETROS);
-            break;
-        default:
-            break;
-    }
-}
-int dbusinterpreter_read(dbusinterpreter_t *self, const char *src, char *dest, 
-                                                                size_t len) {
-    memcpy(dest, &src[self->i_read], len);
-    self->i_read += len;
-    return 0;
-}
+/**
+ * @brief Imprime por stdout el mensaje correspondiente al id de argumento.
+ */
+static void _mostrar_argumento(size_t id_argumento);
+
+/**
+ * @brief Lee desde src la longitud indicada y lo copia en dest.
+ */
+static int dbusinterpreter_read(dbusinterpreter_t *self, const char *src, 
+                                                    char *dest, size_t len);
+
+/**
+ * @brief Imprime por stdout los argumentos de buff que se encuentran 
+ * codificados según el protocolo dbus.
+ */
+static void dbusinterpreter_show_arguments(dbusinterpreter_t *self, char *buff);
+
+/**
+ * @brief Imprime por stdout los parametros de buff que se encuentran 
+ * codificados según el protocolo dbus.
+ */
+static void dbusinterpreter_show_parameters(dbusinterpreter_t *self, 
+                                                                    char *buff);
+
+/**
+ * @brief Reserva memoria suficiente para recibir desde el host remoto el header
+ * del mensaje.
+ * @param buff: puntero al buffer donde se recibirá la información
+ * @param client: socket asociado al host remoto.
+ * @return 0 en caso de éxito.
+ */
+static int dbusinterpreter_get_header(dbusinterpreter_t *self, char **buff, 
+                                                            socket_t *client);
+
+/**
+ * @brief Reserva memoria suficiente para recibir desde el host remoto el body
+ * del mensaje.
+ * @param buff: puntero al buffer donde se recibirá la información
+ * @param client: socket asociado al host remoto.
+ * @return 0 en caso de éxito.
+ */
+static int dbusinterpreter_get_body(dbusinterpreter_t *self, char **buff, 
+                                                            socket_t *client);
+
+
 
 int dbusinterpreter_create(dbusinterpreter_t *self) {
     return 0;
@@ -59,12 +77,13 @@ void dbusinterpreter_show_id(dbusinterpreter_t *self) {
     printf(MSG_ID_FORMAT, self->id);
 }
 
-void dbusinterpreter_show_arguments(dbusinterpreter_t *self, char *buff) {
+static void dbusinterpreter_show_arguments(dbusinterpreter_t *self, 
+                                                                char *buff) {
     self->i_read = 0;
     for (int i = 0; i < self->len_header; i++) {
         char param_id = buff[self->i_read];
         printf("%s", ITEM_BULLET);
-        _mostrar_parametro(param_id);
+        _mostrar_argumento(param_id);
         self->i_read += FOUR_BYTES;
         printf("%s", ITEM_END);
         if (param_id == ID_PARAMETROS) 
@@ -78,7 +97,9 @@ void dbusinterpreter_show_arguments(dbusinterpreter_t *self, char *buff) {
             break;
     }
 }
-void dbusinterpreter_show_parameters(dbusinterpreter_t *self, char *buff) {
+
+static void dbusinterpreter_show_parameters(dbusinterpreter_t *self, 
+                                                                char *buff) {
     self->i_read = 0;
     for (int i = 0; i < self->len_body; i++) {
         printf("%s", PARAM_BULLET);
@@ -92,7 +113,7 @@ void dbusinterpreter_show_parameters(dbusinterpreter_t *self, char *buff) {
     }
 }
 
-int dbusinterpreter_get_header(dbusinterpreter_t *self, char **buff, 
+static int dbusinterpreter_get_header(dbusinterpreter_t *self, char **buff, 
                                                             socket_t *client) {
     *buff = malloc(self->len_header * sizeof(char));
     if (*buff == NULL) {
@@ -104,7 +125,7 @@ int dbusinterpreter_get_header(dbusinterpreter_t *self, char **buff,
     return 0;
 }
 
-int dbusinterpreter_get_body(dbusinterpreter_t *self, char **buff, 
+static int dbusinterpreter_get_body(dbusinterpreter_t *self, char **buff, 
                                                             socket_t *client) {
     *buff = malloc(self->len_body * sizeof(char));
     if (*buff == NULL) {
@@ -137,3 +158,31 @@ int dbusinterpreter_get_and_show_header(dbusinterpreter_t *self,
     return 0;
 }
 
+static int dbusinterpreter_read(dbusinterpreter_t *self, const char *src, 
+                                                    char *dest, size_t len) {
+    memcpy(dest, &src[self->i_read], len);
+    self->i_read += len;
+    return 0;
+}
+
+static void _mostrar_argumento(size_t id_argumento) {
+    switch (id_argumento) {
+        case ID_DESTINO:
+            printf("%s", MSG_DESTINO);
+            break;
+        case ID_RUTA:
+            printf("%s", MSG_RUTA);
+            break;
+        case ID_INTERFAZ:
+            printf("%s", MSG_INTERFAZ);
+            break;
+        case ID_METODO:
+            printf("%s", MSG_METODO);
+            break;
+        case ID_PARAMETROS:
+            printf("%s", MSG_PARAMETROS);
+            break;
+        default:
+            break;
+    }
+}

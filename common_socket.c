@@ -23,7 +23,7 @@ typedef struct addrinfo addrinfo_t;
 
 
 /**
- * Dado un host y un servicio, se resuelve la información de direcciones
+ * @brief Dado un host y un servicio, se resuelve la información de direcciones
  * IPv 4 asociada a ese host. 
  * @param host nombre de dominio o ip en forma de cadena.
  * @param service nombre de servicio o puerto.
@@ -34,7 +34,7 @@ typedef struct addrinfo addrinfo_t;
 static int _socket_resolve_addrinfo(socket_t *self, const char *host, 
                                     const char *service, addrinfo_t **result);
 /**
- * Dada información de un host particular se intentará establecer una conexión.
+ * @brief Dada información de un host particular se intentará establecer una conexión.
  * @param host_info información del host al que se quiere conectar.
  * @return 0 en caso de éxito, -1 en caso de error.
  * @post En caso de éxito se asocia el file_descriptor del socket.
@@ -42,7 +42,7 @@ static int _socket_resolve_addrinfo(socket_t *self, const char *host,
 static int _socket_engage_host(socket_t *self, addrinfo_t *host_info);
 
 /**
- * Dada una lista de hosts se intentará acoplar secuencialmente a cada uno,
+ * @brief Dada una lista de hosts se intentará acoplar secuencialmente a cada uno,
  * hasta poder conectarse a alguno.
  * @param hosts lista de hosts posibles a conectarse.
  * @return devuelve true en caso de éxito, false en caso contrario.
@@ -50,13 +50,35 @@ static int _socket_engage_host(socket_t *self, addrinfo_t *host_info);
 static bool _socket_multiple_engage(socket_t *self, addrinfo_t *hosts);
 
 
+/**
+ * @brief Se intentará asociar el servicio y host con el socket.
+ * @param host nombre de dominio o ip en forma de cadena.
+ * @param service nombre de servicio o puerto.
+ * @return devuelve 0 en caso de éxito.
+ */
 static int _socket_engage_service(socket_t *self, const char *host, 
-            const char *service);
+                                                        const char *service);
 
+/**
+ * @brief Se intercambiarán datos. La función de intercambio se configura antes
+ * de llamar a la función.
+ * @param buf buffer a emplear.
+ * @param longitud tamaño del buffer.
+ * @return Cantidad de bytes intercambiados.
+ */
 static int _socket_interchange_data(socket_t *self, char *buf, size_t length);
 
 
+/**
+ * @brief Función nula.
+ */
 static int _engage_null_options(int fd);
+
+/**
+ * @brief Se configura el socketopt para el bind.
+ * @param fd file descritor asociado al socket.
+ * @return 0 en caso de éxito.
+ */
 static int _engage_bind_options(int fd);
 
 static ssize_t _interchanger_send(int sockfd, char *buf, size_t len);

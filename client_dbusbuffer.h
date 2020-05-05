@@ -24,8 +24,23 @@ typedef struct dbusbuffer {
     dbusbufferconf_t conf;
 } dbusbuffer_t;
 
+/**
+ * @brief Constructor.
+ */
 int dbusbuffer_create(dbusbuffer_t *self, dbus_t *dbus, dbusbufferconf_t conf);
+
+/**
+ * @brief Prepara el tamaño del buffer para manejar los datos.
+ */
 int dbusbuffer_prepare(dbusbuffer_t *self);
+
+/**
+ * @brief Complata el buffer con los datos.
+ */
 int dbusbuffer_fill(dbusbuffer_t *self);
+
+/**
+ * @brief Destructor.
+ */
 int dbusbuffer_destroy(dbusbuffer_t *self);
 #endif

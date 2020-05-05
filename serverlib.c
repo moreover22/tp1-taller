@@ -8,6 +8,12 @@
 #include "server_dbusinterpreter.h"
 
 #define SUCCESS 0
+/**
+ * @brief Intercambia mensajes con el client.
+ * @return 0 en caso de éxito.
+ * @pre el cliente ya se encuentra conectado.
+ */
+static int server_comunicate(server_t *self, socket_t *client);
 
 int server_create(server_t *self, char *service) {
     if (socket_create(&self->socket, SERVER) != SUCCESS) {
@@ -23,7 +29,7 @@ int server_accept(server_t *self, socket_t *client) {
 }
 
 
-int server_comunicate(server_t *self, socket_t *client) {
+static int server_comunicate(server_t *self, socket_t *client) {
     char header_start[HEADER_START];
 
     if (socket_receive(client, (char *) &header_start, HEADER_START) <= 0) 

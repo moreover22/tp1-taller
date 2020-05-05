@@ -6,12 +6,15 @@
 #include <string.h>
 
 #define EOL '\n'
+/**
+ * @brief Lee un comando desde el archivo del commandlist, y lo guarda en 
+ * buffer bd. Un comando se delimita por EOL.
+ * @return 0 en caso de éxito.
+ */
+static int _read_command(commandlist_t *self, bufferdinamico_t * bd);
 
 int commandlist_create(commandlist_t *self, FILE *stream) {
     self->stream = stream;
-    self->state = SEARCHING;
-    self->start = 0;
-    self->end = 0;
     self->buff_estatico_len = 0;
     memset(&self->buff_estatico, 0, WORD_SIZE);
     return 0;
@@ -37,9 +40,7 @@ static int _read_command(commandlist_t *self, bufferdinamico_t * bd) {
         int bytes_read = fread(buffer_estatico, sizeof(char), WORD_SIZE, 
                                                                 self->stream);
         buffer_estatico[WORD_SIZE] = 0;
-
         char *end_of_line = strchr(buffer_estatico, EOL);
-        
         if (end_of_line != NULL) {
             size_t i_eol = end_of_line - buffer_estatico + 1;
             size_t new_len = bytes_read - i_eol;

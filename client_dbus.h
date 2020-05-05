@@ -2,6 +2,8 @@
 #define __CLIENT_DBUS_H
 #include <stddef.h>
 #include <arpa/inet.h>
+#include <stdio.h>
+
 #include "clientlib.h"
 #include "common_buffer.h"
 #include "clientlib.h"
@@ -13,7 +15,7 @@ typedef struct dbus {
     const char *command;
     size_t command_len;
     client_t client;
-    size_t cant_argumentos;
+    size_t cant_parametros;
     size_t header_size;
     size_t body_size;
     buffer_t header_buffer;
@@ -23,11 +25,25 @@ typedef struct dbus {
     size_t last_argument_id;
 } dbus_t;
 
+/**
+ * @brief Constructor. 
+ * @param callback: Función que será llamada una vez tenido el buffer con el 
+ * commando ya codificado.
+ * @return 0 en caso de éxito.
+ */
 int dbus_create(dbus_t *self, dbus_callback_t callback);
+
+/**
+ * @brief Lee los comandos del archivo input y los manda al host remoto.
+ * @param host: ip o hostname local.
+ * @param service: numero de puerto o nombre de servicio.
+ * @return 0 en caso de éxito.
+ */
+int dbus_process_file_and_send(dbus_t *self, FILE *input, const char *host, 
+                                                            const char *port);
+
+/**
+ * @brief Destructor. 
+ */
 int dbus_destroy(dbus_t *self);
-int dbus_process(dbus_t *self, const char * command);
-
-int dbus_create_client(dbus_t *self, const char *host, const char *service);
-int dbus_destroy_client(dbus_t *self);
-
 #endif

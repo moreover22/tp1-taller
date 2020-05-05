@@ -3,6 +3,12 @@
 #define TAM_INICIAL 100 
 #define REDIM_PROP 1.5
 
+/**
+ * @brief En caso de que no entren 'len' bytes en el buffer, se redimensiona sin
+ * perder información
+ * @return 0 en caso de éxito.
+ */
+static int _buffer_dinamico_redimenion(bufferdinamico_t *self, size_t len);
 
 int bufferdinamico_create(bufferdinamico_t *self) {
     buffer_create(&self->buffer);
@@ -13,6 +19,7 @@ int bufferdinamico_create(bufferdinamico_t *self) {
     self->tam_actual = TAM_INICIAL;
     return 0;
 }
+
 static int _buffer_dinamico_redimenion(bufferdinamico_t *self, size_t len) {
     if (self->len + len < self->tam_actual){
         return 0;
