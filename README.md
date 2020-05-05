@@ -10,7 +10,12 @@
 
 Contenidos
 ---
-
+- [Introducción](#Introducción)
+- [Lectura de archivos](#Lectura-de-archivos)
+- [Socket | Cliente - Servidor](#Socket-|-Cliente---Servidor)
+- [El protocolo DBUS](#El-protocolo-DBUS)
+- [Conclusión](#Conclusión)
+- [Referencia](#Referencia)
 
 Introducción
 ---
@@ -19,22 +24,20 @@ El trabajo práctico tiene como objetivo dominar el manejo de sockets, archivos 
 
 Lectura de archivos
 ---
-Los comandos seran leidos desde un archivo cuya ruta fue pasada por parámetro (o del `stdin` si ninguno fue especificado). Cada comando se encuentra en una línea distinta, es decir están separados por el carácter `\n` o salto de línea. Un primer acercamiento para poder obtener el comando es: leer el comando carácter por carácter hasta toparse con el salto de línea. En ese caso, copiar esa información a un buffer y luego transmitirla con el protocolo. Sin embargo, esto no es eficiente, como la función `read` para leer de un archivo, es una función costosa, como el resto de las `syscalls`, se espera ejecutarla el menor número de veces posibles. 
+Los comandos serán leídos desde un archivo cuya ruta fue pasada por parámetro (o del `stdin` si ninguno fue especificado). Cada comando se encuentra en una línea distinta, es decir están separados por el carácter `\n` o salto de línea. Un primer acercamiento para poder obtener el comando es: leer el comando carácter por carácter hasta toparse con el salto de línea. En ese caso, copiar esa información a un buffer y luego transmitirla con el protocolo. Sin embargo, esto no es eficiente, como la función `read` para leer de un archivo, es una función costosa, como el resto de las `syscalls`, se espera ejecutarla el menor número de veces posibles. 
 
-Otra manera de encarar el problema, reduciendo las llamadas a `read`, es leer de más de un byte, en este caso se elije leer 32 bytes. Esos 32 bytes se almacenana en un buffer estático (siempre tiene espacio para 32 bytes), una vez leído, se analiza si se llega al final de línea. En el caso de que no se haya encontrado, se almacenan esos 32 bytes en un buffer dinámico (este irá creciendo a medida que se agregan carácteres, en esta implementación, que se puede encontrar en `common_bufferdinamico`, con un factor `REDIM_PROP = 1.5`) y se sigue leyendo. Caso contrario, se encontró el carácter de salto de línea:
+Otra manera de encarar el problema, reduciendo las llamadas a `read`, es leer de más de un byte, en este caso se elije leer 32 bytes. Esos 32 bytes se almacenará en un buffer estático (siempre tiene espacio para 32 bytes), una vez leído, se analiza si se llega al final de línea. En el caso de que no se haya encontrado, se almacenan esos 32 bytes en un buffer dinámico (este irá creciendo a medida que se agregan caracteres, en esta implementación, que se puede encontrar en `common_bufferdinamico`, con un factor `REDIM_PROP = 1.5`) y se sigue leyendo. Caso contrario, se encontró el carácter de salto de línea:
  - Se almacenan los bytes hasta el `\n` en el buffer dinámico.
  - Los bytes restantes, se almacenan en otro buffer estático de 32 bytes, que se tendrán en cuenta en la siguiente iteración.
 
 En la siguiente iteración, si hay algo en el segundo buffer estático, se almacena su contenido en el dinámico y se sigue con el bucle.
 
-El encargado de manejar la correcta lectura del comando será el TDA `common_commandlist` e interacturá con los buffers de la siguiente manera:
+El encargado de manejar la correcta lectura del comando será el TDA `common_commandlist` e interactuará con los buffers de la siguiente manera:
 
 
 <p align="center"> 
     <img src="images/DC-buffers.png" alt="Diagrama de clases-buffers">
 </p>
-
-![](images/DC-buffers.png)
 
 Una vez obtenido un comando, el mismo se codifica según el protocolo y se envía al servidor.
 
@@ -42,14 +45,17 @@ Una vez obtenido un comando, el mismo se codifica según el protocolo y se enví
 Socket | Cliente - Servidor
 ---
 
-En el trabajo se implementó una librería dedicada exclusivamente a los sockets (`common_socket`), la cual fue diseñada para que esté abstraida de este tp en particular y pueda ser usada en futuras oportunidades.
+En el trabajo se implementó una librería dedicada exclusivamente a los sockets (`common_socket`), la cual fue diseñada para que esté abstraída de este tp en particular y pueda ser usada en futuras oportunidades.
 
-La misma cuenta con funciones génericas: constructor y destructor, una función para recibier y otra para enviar, funciones para la conexión tanto del cliente (`connect`), como para el servidor (`accept`, `bind_and_listen`). 
+La misma cuenta con funciones genéricas: constructor y destructor, una función para recibir y otra para enviar, funciones para la conexión tanto del cliente (`connect`), como para el servidor (`accept`, `bind_and_listen`). 
 
-Este TDA, permite abstraerse de las consideraciones que hay que tener al momento de trabajar con sockets: resolver nombres de dominio, resolver nombres de servicios, intentar conectarse por múltiples caminos (hasta extablecer la conexión), enviar el mensaje la cantidad de veces necesarias para que el mensaje enviado sea el correcto.
+Este TDA, permite abstraerse de las consideraciones que hay que tener al momento de trabajar con sockets: resolver nombres de dominio, resolver nombres de servicios, intentar conectarse por múltiples caminos (hasta establecer la conexión), enviar el mensaje la cantidad de veces necesarias para que el mensaje enviado sea el correcto.
 
 Como una capa mayor de abstracción, se implementaron los TDA *client* (`clientlib`) y de *server* (`serverlib`), evitando así trabajar directamente con el TDA `socket`.
 
+<p align="center"> 
+    <img src="images/DC-server-client-dbus.png" alt="Diagrama de clases-buffers">
+</p>
 
 El protocolo DBUS
 ---
@@ -65,7 +71,7 @@ El `header` contiene:
  |6C 01 00 01             |                         |  |l...            |
  ```
 
-[Aclaración: En el panel de la izquierda, se encuentra los bytes expresados en hexadecimal y a la derecha su correspondiente equivalente en ASCII (si el caracter no tiene significado en la explicación, se representa con '.'). Formato similar al de el editor [hexed](https://hexed.it/) ].
+[Aclaración: En el panel de la izquierda, se encuentra los bytes expresados en hexadecimal y a la derecha su correspondiente equivalente en ASCII (si el carácter no tiene significado en la explicación, se representa con '.'). Formato similar al de el editor [hexed](https://hexed.it/) ].
 
 Donde el primer `6C` corresponde al carácter en [ASCII] 'l'. Luego, `01 00 01` corresponden a `llamada a método`, `sin flags` y `versión del 1 protocolo` respectivamente. Estos primeros bytes permanecerán constantes para esta implementación del protoco.
 
@@ -117,7 +123,9 @@ De este análisis del protocolo, se tomaron las siguientes decisiones:
     - Se leen los primeros 4 bytes, determinando así la longitud.
     - Se leen los siguientes bytes determinados por la longitud.
 
-
+Conclusión
+---
+El manejo de sockets conlleva a tener varias consideraciones, en todo punto de la ejecución puede llegar a fallar, con lo cual leer las cosas lo antes posibles y liberar los recursos de red para evitar inconvenientes. En cuanto al protocolo DBUS, si bien el padding al momento de codificar no es trivial en un principio, luego para decodificar hace que la lectura sea más fácil, porque es más simple segmentar el mensaje. Durante el tp, se emplearon varias veces buffers, con lo cual fue un acierto implementarlo con un TDA, esto hace que sea más cómodo para utilizar abstrayendose de la implementación y el manejo de memoria directo.
 
 Referencias
 ---
