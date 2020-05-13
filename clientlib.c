@@ -1,6 +1,5 @@
 #include "clientlib.h"
 #include <stdlib.h>
-
 int client_create(client_t *self, const char *hostname, const char *service) {
     if (socket_create(&self->socket, CLIENT) != 0) 
         return CLIENT_ERROR;

@@ -11,8 +11,8 @@
 
 
 int send_message_callback(char *buff, size_t len, void *ctx) {
-    dbus_t *dbus = (dbus_t *) ctx;
-    if (client_send(&dbus->client, buff, len) <= 0) {
+    client_t *client = (client_t *) ctx;
+    if (client_send(client, buff, len) <= 0) {
         return ERROR;
     }
     return SUCCESS;
@@ -36,11 +36,13 @@ int main(int argc, char const *argv[]) {
         fclose(input);
         return ERROR;
     }
+
     if (dbus_process_file_and_process(&dbus, input, &client) != 0) {
         fprintf(stderr, "No se puedo codificar");
         if (input != stdin) fclose(input);
         return ERROR;
     }
+
     client_destroy(&client);
     dbus_destroy(&dbus);
     if (input != stdin) 

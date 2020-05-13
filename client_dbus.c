@@ -17,7 +17,7 @@
  * @brief Le aplica la funcón de callback a los buffers de header y de body
  * del dbus.
  */
-static int _dbusbuffers_act(dbus_t *self);
+static int _dbusbuffers_act(dbus_t *self, client_t *client);
 
 /**
  * @brief Inicializa la información de los argumentos que manejará el protocolo
@@ -42,7 +42,7 @@ static int _dbusbuffers_destroy(dbus_t *self, dbusheader_t *header,
  * @param command: Comando de dbus.
  * @return 0 en caso de éxito.
  */
-static int dbus_process(dbus_t *self, const char * command);
+static int _dbus_process(dbus_t *self, const char * command, client_t *client);
 
 
 int dbus_create(dbus_t *self, dbus_callback_t callback) {
@@ -53,12 +53,12 @@ int dbus_create(dbus_t *self, dbus_callback_t callback) {
 }
 
 int dbus_process_file_and_process(dbus_t *self, FILE *input, client_t *client) {
-    self->client = *client;
     char *buff;
     commandlist_t cl;
     commandlist_create(&cl, input);
+
     while (commandlist_next(&cl, &buff) == 0) {
-        if (dbus_process(self, buff) != 0) {
+        if (_dbus_process(self, buff, client) != 0) {
             free(buff);
             fprintf(stderr, "Error al enviar mensaje\n");
             return ERROR;
@@ -82,18 +82,19 @@ static void _init_arg_types(dbus_t *self) {
     memcpy(&self->arg_types[4], FIRMA_ID_T, INFORMATION_ARG);
 }
 
-static int dbus_process(dbus_t *self, const char *command) {
+static int _dbus_process(dbus_t *self, const char *command, client_t *client) {
     self->cant_parametros = 0;
     self->last_argument_id = 0;
     self->command = command;
     self->command_len = strlen(command);
     dbusheader_t header;
     dbusbody_t body;
+
     _dbusbuffers_create_and_fill(self, &header, &body);
-    _dbusbuffers_act(self);
+    _dbusbuffers_act(self, client);
     _dbusbuffers_destroy(self, &header, &body);
     char response[LEN_OK_MSG + 1];
-    if (client_receive(&self->client, response, LEN_OK_MSG) <= 0) {
+    if (client_receive(client, response, LEN_OK_MSG) <= 0) {
         return ERROR;
     }
     response[LEN_OK_MSG] = 0;
@@ -111,6 +112,7 @@ static int _dbusbuffers_create_and_fill(dbus_t *self, dbusheader_t *header,
                                                             dbusbody_t *body) {
     dbusheader_create(header, self);
     dbusbody_create(body, self);
+
     dbusbody_prepare(body);
     dbusheader_prepare(header);
     dbusbody_fill(body);
@@ -118,9 +120,9 @@ static int _dbusbuffers_create_and_fill(dbus_t *self, dbusheader_t *header,
     return SUCCESS;
 }
 
-static int _dbusbuffers_act(dbus_t *self) {
-    buffer_act(&self->header_buffer, self->callback, self);
-    buffer_act(&self->body_buffer, self->callback, self);
+static int _dbusbuffers_act(dbus_t *self, client_t *client) {
+    buffer_act(&self->header_buffer, self->callback, client);
+    buffer_act(&self->body_buffer, self->callback, client);
     return SUCCESS;
 }
 
@@ -130,4 +132,3 @@ static int _dbusbuffers_destroy(dbus_t *self, dbusheader_t *header,
     dbusheader_destroy(header);
     return SUCCESS;
 }
-

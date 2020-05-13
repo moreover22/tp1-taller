@@ -1,7 +1,6 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <arpa/inet.h>
-#include <stdio.h>
 #include "client_dbus.h"
 #include "client_dbusbuffer.h"
 #include "client_dbusbody.h"

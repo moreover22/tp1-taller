@@ -1,5 +1,4 @@
 #include "serverlib.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <byteswap.h>
 #include <arpa/inet.h>

@@ -14,7 +14,6 @@ typedef struct dbus {
     dbus_callback_t callback;
     const char *command;
     size_t command_len;
-    client_t client;
     size_t cant_parametros;
     size_t header_size;
     size_t body_size;
