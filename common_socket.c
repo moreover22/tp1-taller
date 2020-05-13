@@ -19,6 +19,7 @@
 #define SUCCESS 0
 #define LISTEN_BACKLOG 10
 
+#define INVALID_FD -1
 typedef struct addrinfo addrinfo_t;
 
 
@@ -86,7 +87,7 @@ static ssize_t _interchanger_receive(int sockfd, char *buf, size_t len);
 
 
 int socket_create(socket_t *self, int how) {
-    self->file_descriptor = -1;
+    self->file_descriptor = INVALID_FD;
     switch (how) {
         case SERVER:
             self->conf.ai_flags = AI_PASSIVE;
@@ -105,6 +106,8 @@ int socket_create(socket_t *self, int how) {
 }
 
 int socket_destroy(socket_t *self) {
+    if (self->file_descriptor == INVALID_FD)
+        return ERROR;
     socket_shutdown(self, SHUT_RDWR);
     close(self->file_descriptor);
     return SUCCESS;
