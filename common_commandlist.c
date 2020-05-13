@@ -56,19 +56,25 @@ static int _read_command(commandlist_t *self, dinamicbuffer_t * bd) {
 
 int commandlist_next(commandlist_t *self, char **buffer) {
     if (feof(self->stream) && self->buff_estatico_len <= 0){
-        return 1;
+        return BUFFER_ERROR;
     }
     dinamicbuffer_t bd;
-    dinamicbuffer_create(&bd);
+
+    if (dinamicbuffer_create(&bd) == BUFFER_ERROR) {
+        return BUFFER_ERROR;
+    }
     if (self->buff_estatico_len > 0) {
         dinamicbuffer_append(&bd, self->buff_estatico, 
                                                     self->buff_estatico_len);
         self->buff_estatico_len = 0;
     }
     _read_command(self, &bd);
-    dinamicbuffer_act(&bd, callback_copy_to_buffer, buffer);
-    dinamicbuffer_destroy(&bd);
-    return 0;
+    if (dinamicbuffer_act(&bd, callback_copy_to_buffer, buffer) 
+                                                            == BUFFER_ERROR) {
+        dinamicbuffer_destroy(&bd);
+        return BUFFER_ERROR;
+    }
+    return dinamicbuffer_destroy(&bd);
 }
 
 int commandlist_destroy(commandlist_t *self) {

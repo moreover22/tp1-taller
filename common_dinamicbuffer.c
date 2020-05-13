@@ -13,11 +13,11 @@ static int _dinamicbuffer_redimension(dinamicbuffer_t *self, size_t len);
 int dinamicbuffer_create(dinamicbuffer_t *self) {
     buffer_create(&self->buffer);
     if (buffer_set_size(&self->buffer, TAM_INICIAL) != 0)
-        return 1;
+        return BUFFER_ERROR;
     
     self->len = 0;
     self->tam_actual = TAM_INICIAL;
-    return 0;
+    return BUFFER_SUCCESS;
 }
 
 static int _dinamicbuffer_redimension(dinamicbuffer_t *self, size_t len) {
@@ -49,8 +49,7 @@ int dinamicbuffer_destroy(dinamicbuffer_t *self) {
 }
 int dinamicbuffer_act(dinamicbuffer_t *self, buffer_callback_t callback, 
                                                                 void *ctx) {
-    buffer_act(&self->buffer, callback, ctx);
-    return 0;
+    return buffer_act(&self->buffer, callback, ctx);
 }
 
 
