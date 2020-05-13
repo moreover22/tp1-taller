@@ -10,7 +10,7 @@
 #define SUCCESS 0
 
 
-int enviar_callback(char *buff, size_t len, void *ctx) {
+int send_message_callback(char *buff, size_t len, void *ctx) {
     dbus_t *dbus = (dbus_t *) ctx;
     if (client_send(&dbus->client, buff, len) <= 0) {
         return ERROR;
@@ -29,7 +29,7 @@ int main(int argc, char const *argv[]) {
     if (!input)
         return ERROR;
     dbus_t dbus;
-    dbus_create(&dbus, enviar_callback);
+    dbus_create(&dbus, send_message_callback);
 
     if (dbus_process_file_and_send(&dbus, input, argv[1], argv[2]) != 0) {
         fprintf(stderr, "No se puedo codificar");

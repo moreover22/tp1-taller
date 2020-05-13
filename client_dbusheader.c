@@ -16,7 +16,7 @@ static size_t _sizeof_argument(size_t len_argument);
 /**
  * @brief Calcula la cantidad de espacio que ocupa la firma del header.
  */
-static size_t _sizeof_firma(size_t cant_argumentos);
+static size_t _sizeof_signature(size_t cant_argumentos);
 
 /**
  * @brief Escribe en el buffer de header un argumento de longitud len_argument
@@ -49,7 +49,7 @@ static size_t _sizeof_argument(size_t len_argument) {
     return INFORMATION_ARG + SIZE_UINT32 + len_argument;
 }
 
-static size_t _sizeof_firma(size_t cant_argumentos) {
+static size_t _sizeof_signature(size_t cant_argumentos) {
     if (cant_argumentos == 0) 
         return 0;
     return INFORMATION_ARG + SIZE_BYTE + cant_argumentos + SIZE_NULL;
@@ -78,7 +78,7 @@ static bool _break_condition_header(char c) {
 }
 
 static void _sizer_header_buffer(dbus_t *self, size_t size) {
-    size_t size_firma = _sizeof_firma(self->cant_parametros);
+    size_t size_firma = _sizeof_signature(self->cant_parametros);
     size_t size_buffer = size + size_withpadding(size_firma, ALIGN);
     size_buffer += HEADER_START;
     self->header_size = size + size_firma;

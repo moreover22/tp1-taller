@@ -8,7 +8,7 @@
 /**
  * @brief Imprime por stdout el mensaje correspondiente al id de argumento.
  */
-static void _mostrar_argumento(size_t id_argumento);
+static void _show_argument(size_t id_argumento);
 
 /**
  * @brief Lee desde src la longitud indicada y lo copia en dest.
@@ -83,7 +83,7 @@ static void dbusinterpreter_show_arguments(dbusinterpreter_t *self,
     for (int i = 0; i < self->len_header; i++) {
         char param_id = buff[self->i_read];
         printf("%s", ITEM_BULLET);
-        _mostrar_argumento(param_id);
+        _show_argument(param_id);
         self->i_read += FOUR_BYTES;
         printf("%s", ITEM_END);
         if (param_id == ID_PARAMETROS) 
@@ -165,7 +165,7 @@ static int dbusinterpreter_read(dbusinterpreter_t *self, const char *src,
     return 0;
 }
 
-static void _mostrar_argumento(size_t id_argumento) {
+static void _show_argument(size_t id_argumento) {
     if      (id_argumento == ID_DESTINO) printf("%s", MSG_DESTINO);
     else if (id_argumento == ID_RUTA) printf("%s", MSG_RUTA);
     else if (id_argumento == ID_INTERFAZ) printf("%s", MSG_INTERFAZ);
