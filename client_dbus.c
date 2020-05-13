@@ -44,20 +44,6 @@ static int _dbusbuffers_destroy(dbus_t *self, dbusheader_t *header,
  */
 static int dbus_process(dbus_t *self, const char * command);
 
-/**
- * @brief Crea el cliente con la información de los parametros. 
- * @param host: ip o hostname.
- * @param service: numero de puerto o nombre de servicio.
- * @return 0 en caso de éxito.
- */
-static int dbus_create_client(dbus_t *self, const char *host, 
-                                                        const char *service);
-
-/**
- * @brief Libera recursos de conexión. 
- * @return 0 en caso de éxito.
- */
-static int dbus_destroy_client(dbus_t *self);
 
 int dbus_create(dbus_t *self, dbus_callback_t callback) {
     _init_arg_types(self);
@@ -66,14 +52,8 @@ int dbus_create(dbus_t *self, dbus_callback_t callback) {
     return SUCCESS;
 }
 
-
-int dbus_process_file_and_send(dbus_t *self, FILE *input, const char *host, 
-                                                            const char *port) {
-    if (dbus_create_client(self, host, port) != CLIENT_SUCCESS) {
-        fprintf(stderr, "Error al crear el cliente\n");
-        fclose(input);
-        return ERROR;
-    }
+int dbus_process_file_and_process(dbus_t *self, FILE *input, client_t *client) {
+    self->client = *client;
     char *buff;
     commandlist_t cl;
     commandlist_create(&cl, input);
@@ -86,10 +66,8 @@ int dbus_process_file_and_send(dbus_t *self, FILE *input, const char *host,
         free(buff);
     }
     commandlist_destroy(&cl);
-    dbus_destroy_client(self);
     return 0;
 }
-
 
 static void _init_arg_types(dbus_t *self) {
     const char *DESTINO_ID_T = (char []) DESTINO_ID;
@@ -102,10 +80,6 @@ static void _init_arg_types(dbus_t *self) {
     memcpy(&self->arg_types[2], INTERFAZ_ID_T, INFORMATION_ARG);
     memcpy(&self->arg_types[3], FUNCION_ID_T, INFORMATION_ARG);
     memcpy(&self->arg_types[4], FIRMA_ID_T, INFORMATION_ARG);
-}
-
-int dbus_create_client(dbus_t *self, const char *host, const char *service) {
-    return client_create(&self->client, host, service);
 }
 
 static int dbus_process(dbus_t *self, const char *command) {
@@ -128,9 +102,6 @@ static int dbus_process(dbus_t *self, const char *command) {
     return SUCCESS;
 }
 
-int dbus_destroy_client(dbus_t *self) {
-    return client_destroy(&self->client);
-}
 
 int dbus_destroy(dbus_t *self) {
     return SUCCESS;

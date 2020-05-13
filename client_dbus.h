@@ -35,12 +35,9 @@ int dbus_create(dbus_t *self, dbus_callback_t callback);
 
 /**
  * @brief Lee los comandos del archivo input y los manda al host remoto.
- * @param host: ip o hostname local.
- * @param service: numero de puerto o nombre de servicio.
  * @return 0 en caso de éxito.
  */
-int dbus_process_file_and_send(dbus_t *self, FILE *input, const char *host, 
-                                                            const char *port);
+int dbus_process_file_and_process(dbus_t *self, FILE *input, client_t *client);
 
 /**
  * @brief Destructor. 

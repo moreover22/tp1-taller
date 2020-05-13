@@ -30,13 +30,19 @@ int main(int argc, char const *argv[]) {
         return ERROR;
     dbus_t dbus;
     dbus_create(&dbus, send_message_callback);
-
-    if (dbus_process_file_and_send(&dbus, input, argv[1], argv[2]) != 0) {
+    client_t client;
+    if (client_create(&client, argv[1], argv[2]) != CLIENT_SUCCESS) {
+        fprintf(stderr, "Error al crear el cliente\n");
+        fclose(input);
+        return ERROR;
+    }
+    if (dbus_process_file_and_process(&dbus, input, &client) != 0) {
         fprintf(stderr, "No se puedo codificar");
         if (input != stdin) fclose(input);
         return ERROR;
     }
-    dbus_destroy(&dbus);    
+    client_destroy(&client);
+    dbus_destroy(&dbus);
     if (input != stdin) 
         fclose(input);
     return SUCCESS;
