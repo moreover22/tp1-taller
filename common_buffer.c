@@ -19,12 +19,13 @@ int buffer_set_size(buffer_t *self, size_t size) {
 }
 
 int buffer_redimension(buffer_t *self, size_t new_size) {
-    char *new_buffer = malloc(new_size * sizeof(char));
-    if (new_buffer == NULL) 
+    char *new_buffer = realloc(self->buffer, new_size * sizeof(char));
+    if (new_buffer == NULL) {
+        free(self->buffer);
         return BUFFER_ERROR;
-    memset(new_buffer, 0, new_size);
-    memcpy(new_buffer, self->buffer, self->size);
-    free(self->buffer);
+    }
+    for (int i = self->size; i < new_size; i++) 
+        new_buffer[i] = 0;
     self->buffer = new_buffer;
     self->size = new_size;
     return BUFFER_SUCCESS;
