@@ -59,15 +59,16 @@ int commandlist_next(commandlist_t *self, char **buffer) {
         return BUFFER_ERROR;
     }
     dinamicbuffer_t bd;
-
-    if (dinamicbuffer_create(&bd) == BUFFER_ERROR) {
+    if (dinamicbuffer_create(&bd) == BUFFER_ERROR) 
         return BUFFER_ERROR;
-    }
+
     if (self->buff_estatico_len > 0) {
-        dinamicbuffer_append(&bd, self->buff_estatico, 
+        int status = dinamicbuffer_append(&bd, self->buff_estatico, 
                                                     self->buff_estatico_len);
+        if (status != 0) return BUFFER_ERROR;
         self->buff_estatico_len = 0;
     }
+
     _read_command(self, &bd);
     if (dinamicbuffer_act(&bd, callback_copy_to_buffer, buffer) 
                                                             == BUFFER_ERROR) {

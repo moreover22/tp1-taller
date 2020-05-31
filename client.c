@@ -33,12 +33,15 @@ int main(int argc, char const *argv[]) {
     client_t client;
     if (client_create(&client, argv[1], argv[2]) != CLIENT_SUCCESS) {
         fprintf(stderr, "Error al crear el cliente\n");
+        dbus_destroy(&dbus);
         fclose(input);
         return ERROR;
     }
 
     if (dbus_process_file_and_process(&dbus, input, &client) != 0) {
         fprintf(stderr, "No se puedo codificar");
+        client_destroy(&client);
+        dbus_destroy(&dbus);
         if (input != stdin) fclose(input);
         return ERROR;
     }
